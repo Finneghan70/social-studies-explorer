@@ -1,470 +1,163 @@
-// ==========================================
-// BC SOCIAL STUDIES EXPLORER ENGINE
-// Version 1
-// ==========================================
+const siteConfig = {
+    title: "BC Social Studies Explorer",
 
-const unit = {
+    subtitle:
+        "Investigate. Discover. Think Like a Historian.",
 
-    title: "Where We Live Matters",
-
-    essentialQuestion:
-        "How does geography influence where people live?",
-
-    mission:
-        "A new community wants to settle in British Columbia. Your mission is to investigate the evidence and recommend the best location.",
-
-    activation: {
-        question:
-            "Which geographic feature is most important for a settlement?",
-
-        options: [
-            "Mountain",
-            "River",
-            "Forest",
-            "Road"
-        ],
-
-        answer: "River"
-    },
-
-    learnCards: [
-        {
-            title: "BC's Geographic Regions",
-
-            content:
-                "British Columbia contains mountains, forests, plateaus, valleys, rivers, and coastlines. These physical features influence where people live and work."
-        },
-
-        {
-            title: "Natural Resources",
-
-            content:
-                "Resources such as forests, fisheries, farmland, and minerals support communities and economies throughout British Columbia."
-        },
-
-        {
-            title: "Communities and Place",
-
-            content:
-                "Many communities develop near transportation routes, rivers, ports, and places where resources are available."
-        }
-    ],
-
-    evidenceCards: [
-        {
-            title: "Regional Map",
-
-            content:
-                "Examine a map showing water sources, transportation routes, and physical geography."
-        },
-
-        {
-            title: "Community Photograph",
-
-            content:
-                "Look carefully at the photo and identify clues about how geography influences daily life."
-        },
-
-        {
-            title: "Historical Account",
-
-            content:
-                "Read how early settlers chose locations for their communities."
-        },
-
-        {
-            title: "Resource Profile",
-
-            content:
-                "Investigate the resources available in different regions of BC."
-        }
-    ],
-
-    challenge: {
-        title: "Community Planning Challenge",
-
-        content:
-            "Recommend the best location for a new community. Use evidence from your investigation to support your decision."
-    },
-
-    badge:
-        "Geography Explorer"
+    background:
+        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee"
 };
 
-// ==========================================
-// SCREENS
-// ==========================================
+const units = [
 
-const screens = [
-    "mission",
-    "activate",
-    "learn1",
-    "learn2",
-    "learn3",
-    "evidence",
-    "challenge",
-    "reflection",
-    "badge"
-];
+{
+    id: 1,
+    emoji: "🌎",
+    title: "Where We Live Matters",
+    question: "How does geography influence where people live?"
+},
 
-let currentScreen = 0;
+{
+    id: 2,
+    emoji: "🪶",
+    title: "Living on the Land",
+    question: "How do environments shape communities?"
+},
 
-let evidenceViewed = [
-    false,
-    false,
-    false,
-    false
-];
+{
+    id: 3,
+    emoji: "🛶",
+    title: "Encounters and Exchange",
+    question: "What happens when cultures meet?"
+},
 
-// ==========================================
-// PAGE ELEMENTS
-// ==========================================
+{
+    id: 4,
+    emoji: "🏛",
+    title: "Government & Leadership",
+    question: "How are decisions made?"
+},
 
-const content =
-    document.getElementById("content");
+{
+    id: 5,
+    emoji: "🌍",
+    title: "Migration & Identity",
+    question: "Why do people move?"
+},
 
-const nextBtn =
-    document.getElementById("next-btn");
-
-const backBtn =
-    document.getElementById("back-btn");
-
-document.getElementById("unit-title").textContent =
-    unit.title;
-
-document.getElementById("essential-question").textContent =
-    unit.essentialQuestion;
-
-// ==========================================
-// PROGRESS BAR
-// ==========================================
-
-function updateProgress() {
-
-    const progress =
-        Math.round(
-            ((currentScreen + 1) / screens.length) * 100
-        );
-
-    document.getElementById("progress-fill").style.width =
-        progress + "%";
-
-    document.getElementById("progress-text").textContent =
-        "Progress: " + progress + "%";
+{
+    id: 6,
+    emoji: "⏳",
+    title: "Then, Now & Next",
+    question: "How do societies change?"
 }
 
-// ==========================================
-// RENDER SCREEN
-// ==========================================
+];
 
-function renderScreen() {
+const app = document.getElementById("app");
 
-    updateProgress();
+showHome();
 
-    const screen =
-        screens[currentScreen];
+function showHome() {
 
-    // ============================
-    // MISSION
-    // ============================
+    app.innerHTML = `
+    
+    <div class="home-screen"
+         style="background-image:url('${siteConfig.background}')">
 
-    if (screen === "mission") {
+        <div class="home-overlay">
 
-        content.innerHTML = `
-            <div class="card">
-                <h2>Mission Briefing</h2>
+            <h1>${siteConfig.title}</h1>
 
-                <p>${unit.mission}</p>
+            <p>${siteConfig.subtitle}</p>
 
-                <div class="feedback">
-                    📘 Record your predictions in your Explorer Journal.
-                </div>
-            </div>
-        `;
-    }
+            <div class="unit-grid">
 
-    // ============================
-    // ACTIVATE
-    // ============================
+                ${units.map(unit => `
 
-    else if (screen === "activate") {
+                    <div class="unit-card"
+                         onclick="loadUnit(${unit.id})">
 
-        let optionButtons =
-            unit.activation.options.map(option =>
+                        <h3>${unit.emoji} ${unit.title}</h3>
 
-                `<button class="option-btn"
-                    onclick="checkAnswer('${option}')">
-                    ${option}
-                </button>`
-
-            ).join("");
-
-        content.innerHTML = `
-            <div class="card">
-
-                <h2>Activate Prior Knowledge</h2>
-
-                <p>${unit.activation.question}</p>
-
-                ${optionButtons}
-
-                <div id="feedback"></div>
-
-            </div>
-        `;
-    }
-
-    // ============================
-    // LEARN CARDS
-    // ============================
-
-    else if (screen.startsWith("learn")) {
-
-        const cardNumber =
-            parseInt(
-                screen.replace("learn", "")
-            );
-
-        const card =
-            unit.learnCards[cardNumber - 1];
-
-        content.innerHTML = `
-            <div class="card">
-
-                <h2>${card.title}</h2>
-
-                <p>${card.content}</p>
-
-                <div class="feedback">
-                    📘 Record important ideas in your Explorer Journal.
-                </div>
-
-            </div>
-        `;
-    }
-
-    // ============================
-    // EVIDENCE BOARD
-    // ============================
-
-    else if (screen === "evidence") {
-
-        let cards =
-            unit.evidenceCards.map((card, index) => {
-
-                return `
-                    <div
-                        class="evidence-card ${evidenceViewed[index] ? "viewed" : ""}"
-                        onclick="openEvidence(${index})">
-
-                        <h3>${card.title}</h3>
-
-                        <p>${card.content}</p>
-
-                        <strong>
-                            ${evidenceViewed[index]
-                                ? "✓ Evidence Examined"
-                                : "Click to Investigate"}
-                        </strong>
+                        <p>${unit.question}</p>
 
                     </div>
-                `;
-            }).join("");
 
-        content.innerHTML = `
-            <div class="card">
-
-                <h2>Investigation Board</h2>
-
-                <p>
-                Open all evidence cards before unlocking the Challenge.
-                </p>
-
-                <div class="evidence-grid">
-
-                    ${cards}
-
-                </div>
-
-                <div class="feedback">
-
-                    Evidence Viewed:
-                    ${evidenceViewed.filter(Boolean).length}
-                    /
-                    ${unit.evidenceCards.length}
-
-                </div>
+                `).join("")}
 
             </div>
-        `;
-    }
 
-    // ============================
-    // CHALLENGE
-    // ============================
+        </div>
 
-    else if (screen === "challenge") {
-
-        content.innerHTML = `
-            <div class="card">
-
-                <h2>${unit.challenge.title}</h2>
-
-                <p>${unit.challenge.content}</p>
-
-                <div class="feedback">
-
-                    📘 Complete your response in your Explorer Journal.
-
-                </div>
-
-            </div>
-        `;
-    }
-
-    // ============================
-    // REFLECTION
-    // ============================
-
-    else if (screen === "reflection") {
-
-        content.innerHTML = `
-            <div class="card">
-
-                <h2>Reflection</h2>
-
-                <ul>
-
-                    <li>What surprised you?</li>
-
-                    <li>Which evidence was most useful?</li>
-
-                    <li>What questions remain?</li>
-
-                </ul>
-
-                <div class="feedback">
-
-                    📘 Record your reflection in your journal.
-
-                </div>
-
-            </div>
-        `;
-    }
-
-    // ============================
-    // BADGE
-    // ============================
-
-    else if (screen === "badge") {
-
-        content.innerHTML = `
-            <div class="card badge">
-
-                <h2>🏆 Mission Complete!</h2>
-
-                <h3>${unit.badge}</h3>
-
-                <p>
-                    Congratulations! You have completed this mission.
-                </p>
-
-            </div>
-        `;
-    }
+    </div>
+    `;
 }
 
-// ==========================================
-// ACTIVATION QUESTION
-// ==========================================
+function loadUnit(id) {
 
-function checkAnswer(answer) {
+    const selectedUnit =
+        units.find(u => u.id === id);
 
-    const feedback =
-        document.getElementById("feedback");
+    app.innerHTML = `
 
-    if (answer === unit.activation.answer) {
+    <div class="container">
 
-        feedback.innerHTML = `
+        <header>
+
+            <h1>${selectedUnit.title}</h1>
+
+            <p>${selectedUnit.question}</p>
+
+            <div class="progress-bar">
+
+                <div
+                    class="progress-fill"
+                    style="width:10%">
+                </div>
+
+            </div>
+
+            <p>Progress: 10%</p>
+
+        </header>
+
+        <div class="card">
+
+            <h2>Mission Briefing</h2>
+
+            <p>
+
+                Welcome, Explorer!
+
+                Your mission is to investigate evidence,
+                think critically, and solve a challenge.
+
+            </p>
+
             <div class="feedback">
-                ✅ Great thinking! Water is often an important factor when choosing where people settle.
+
+                Record your ideas in your Explorer Journal.
+
             </div>
-        `;
-    }
 
-    else {
+        </div>
 
-        feedback.innerHTML = `
-            <div class="feedback">
-                ✅ Interesting thinking! Continue investigating to learn more about settlement choices.
-            </div>
-        `;
-    }
+        <div class="navigation">
+
+            <button
+                class="back-btn"
+                onclick="showHome()">
+                Home
+            </button>
+
+            <button
+                class="next-btn">
+                Begin Mission
+            </button>
+
+        </div>
+
+    </div>
+    `;
 }
-
-// ==========================================
-// EVIDENCE CARDS
-// ==========================================
-
-function openEvidence(index) {
-
-    evidenceViewed[index] = true;
-
-    const evidence =
-        unit.evidenceCards[index];
-
-    alert(
-        evidence.title +
-        "\\n\\n" +
-        evidence.content
-    );
-
-    renderScreen();
-}
-
-// ==========================================
-// NEXT BUTTON
-// ==========================================
-
-nextBtn.addEventListener("click", function () {
-
-    if (
-        screens[currentScreen] === "evidence" &&
-        !evidenceViewed.every(Boolean)
-    ) {
-
-        alert(
-            "Please investigate all evidence cards before continuing."
-        );
-
-        return;
-    }
-
-    if (currentScreen < screens.length - 1) {
-
-        currentScreen++;
-
-        renderScreen();
-    }
-});
-
-// ==========================================
-// BACK BUTTON
-// ==========================================
-
-backBtn.addEventListener("click", function () {
-
-    if (currentScreen > 0) {
-
-        currentScreen--;
-
-        renderScreen();
-    }
-});
-
-// ==========================================
-// INITIAL LOAD
-// ==========================================
-
-renderScreen();
